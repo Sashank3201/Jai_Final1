@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm slop-lint
+      - run: pnpm size
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm e2e
+      - name: Lighthouse
+        run: |
+          pnpm preview &
+          sleep 2
+          CHROME_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")" pnpm lh
