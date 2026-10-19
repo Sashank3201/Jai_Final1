@@ -32,7 +32,7 @@ interface Request {
   origin: Origin;
 }
 
-let running = false;
+let running: StrandId | null = null;
 let queued: Request | null = null;
 let hurry: () => void = () => {};
 let hurried: Promise<void> = Promise.resolve();
@@ -47,6 +47,11 @@ const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 function seedFor(): number {
   const fixed = new URLSearchParams(location.search).get('seed');
   return fixed ? hash(`${fixed}:${switches}`) : (Math.random() * 2 ** 32) >>> 0;
+}
+
+/** The strand the visitor most recently asked for: what the switcher should show as selected. */
+export function latestTarget(): StrandId {
+  return queued?.to ?? running ?? state.strand();
 }
 
 /** Ask for a strand. Never blocks: mid-tear requests are queued and the tear is hurried. */
@@ -64,12 +69,12 @@ export function requestStrand(to: StrandId, origin: Origin = 'key'): void {
 
 async function start(req: Request): Promise<void> {
   if (req.to === state.strand()) return;
-  running = true;
+  running = req.to;
   hurried = new Promise<void>((r) => (hurry = r));
   try {
     await run(req);
   } finally {
-    running = false;
+    running = null;
     const next = queued;
     queued = null;
     if (next) void start(next);
@@ -204,7 +209,7 @@ async function run({ to, origin }: Request): Promise<void> {
       el.dataset.typeset = '';
       restoreAnchor(anchor);
     });
-    const running: Animation[] = [];
+    const tearAnims: Animation[] = [];
     try {
       await vt.ready;
       performance.mark('tear:ready');
@@ -215,7 +220,7 @@ async function run({ to, origin }: Request): Promise<void> {
         easing: EASE_TEAR,
         fill: 'both',
       };
-      running.push(
+      tearAnims.push(
         el.animate(
           { clipPath: [shape.clipFrom, shape.clipTo] },
           { ...timing, id: 'tear-clip', pseudoElement: '::view-transition-old(root)' },
@@ -232,7 +237,7 @@ async function run({ to, origin }: Request): Promise<void> {
       // Skipped (e.g. a page navigation started): the DOM is already in the new strand.
     } finally {
       // Pseudo-element animations outlive their pseudo-elements unless cancelled.
-      for (const a of running) a.cancel();
+      for (const a of tearAnims) a.cancel();
       edge.remove();
     }
   }

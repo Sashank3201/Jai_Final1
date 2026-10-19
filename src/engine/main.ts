@@ -5,7 +5,7 @@ import { isPublicStrandId } from '../strands/ids.ts';
 import { loaders, warmFonts } from '../strands/registry.ts';
 import { announce } from './announce.ts';
 import * as state from './state.ts';
-import { requestStrand } from './transition.ts';
+import { latestTarget, requestStrand } from './transition.ts';
 import { refreshTargets, resetVelocity, startVelocity } from './velocity.ts';
 
 const root = document.documentElement;
@@ -31,8 +31,10 @@ async function mountStrand() {
 }
 
 // ── switcher ────────────────────────────────────────────────────────────────
+// Reflect the latest *request*, not the strand on screen: mid-tear, the radio must already show
+// the queued target, or a tap on the strand being left would fire no change event and be lost.
 function syncSwitcher() {
-  const current = state.strand();
+  const current = latestTarget();
   for (const input of document.querySelectorAll<HTMLInputElement>('input[name="strand"]')) {
     input.checked = input.value === current;
   }

@@ -3,7 +3,7 @@
 // Needs a server on :4321 (pnpm preview). ?seed=1 keeps every seeded visual identical between runs.
 import { mkdir } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
-import sharp from 'sharp';
+import sharp, { type OverlayOptions } from 'sharp';
 
 const strands = (process.argv[2] ?? '01,03').split(',');
 const outDir = process.argv[3] ?? 'qa/shots';
@@ -60,7 +60,7 @@ const gap = 16;
 const labelH = 28;
 const sheetW = Math.max(...rows.map((r) => r.reduce((a, t) => a + t.width + gap, gap)));
 const sheetH = rows.length * (tileH + labelH + gap) + gap;
-const composites: sharp.OverlayOptions[] = [];
+const composites: OverlayOptions[] = [];
 rows.forEach((row, ri) => {
   let x = gap;
   const y = gap + ri * (tileH + labelH + gap);
