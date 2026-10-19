@@ -1,0 +1,70 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import { Font } from 'astro:assets';
+import { profile } from '../../content/profile.ts';
+import { boot, type BootConfig } from '../engine/boot.ts';
+import { AVAILABLE, DEFAULT_STRAND } from '../strands/ids.ts';
+import { strandTokens } from '../strands/tokens.ts';
+import Chrome from '../components/chrome/Chrome.astro';
+import Voice from '../components/Voice.astro';
+import '../styles/reset.css';
+import '../styles/base.css';
+import '../styles/tokens.generated.css';
+import '../styles/strand.css';
+import '../styles/transitions.css';
+import '../strands/01-brooklyn-press/strand.css';
+import '../strands/03-late-edition/strand.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = profile.site.description } = Astro.props;
+const pageTitle = title ? `${title} · ${profile.person.name}` : profile.site.title;
+const canonical = new URL(Astro.url.pathname, profile.site.url).href;
+
+const bootConfig: BootConfig = {
+  def: DEFAULT_STRAND,
+  available: [...AVAILABLE],
+  theme: Object.fromEntries(Object.values(strandTokens).map((t) => [t.id, t.themeColor])),
+};
+const bootScript = `(${boot.toString()})(${JSON.stringify(bootConfig)})`;
+---
+
+<!doctype html>
+<html lang={profile.site.locale} data-strand={DEFAULT_STRAND} data-mode="strand" data-motion="full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style is:inline>
+      @layer reset, base, strand, state;
+    </style>
+    <meta name="theme-color" content={strandTokens[DEFAULT_STRAND].themeColor} />
+    <script is:inline set:html={bootScript} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <Font cssVariable="--font-anybody" preload />
+    <Font cssVariable="--font-archivo" />
+    <Font cssVariable="--font-marker" />
+    <Font cssVariable="--font-stint" />
+    <Font cssVariable="--font-noticia" />
+    <Font cssVariable="--font-grenze" />
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip" href="#main">
+      <Voice k="skip" />
+    </a>
+    <div id="live" class="sr-only" aria-live="polite" transition:persist="live"></div>
+    <Chrome />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <script>
+      import '../engine/main.ts';
+    </script>
+  </body>
+</html>

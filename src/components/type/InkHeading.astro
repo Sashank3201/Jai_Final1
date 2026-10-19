@@ -1,0 +1,32 @@
+---
+// A heading printed in two plates. The key plate is the real, readable text; the second plate
+// is an aria-hidden duplicate offset 2–4px (seeded from the text, so it is stable between builds)
+// that each strand inks, blends and moves its own way. The duplicate is CSS-generated from
+// data-text, so it is never a second text node for crawlers, contrast checkers or copy-paste.
+import { hash, rng } from '../../engine/random.ts';
+import { phAttr } from '../../lib/ph.ts';
+
+interface Props {
+  text: string;
+  as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
+  id?: string;
+  class?: string;
+}
+
+const { text, as: Tag = 'h2', id, class: className } = Astro.props;
+const r = rng(hash(text));
+const sign = () => (r() < 0.5 ? -1 : 1);
+const mx = (2 + r() * 2) * sign();
+const my = (1 + r() * 2) * sign();
+---
+
+<Tag
+  id={id}
+  class:list={['ink', className]}
+  data-ab
+  style={`--mx:${mx.toFixed(2)}px;--my:${my.toFixed(2)}px`}
+  {...phAttr(text)}
+>
+  <span class="ink__key">{text}</span>
+  <span class="ink__plate" data-deco aria-hidden="true" data-text={text}></span>
+</Tag>

@@ -1,0 +1,23 @@
+---
+// Renders a UI string in every strand's voice. CSS shows the active one (base.css, strand.css),
+// so relabelling on a strand switch costs no JS and the accessible name is always what is visible.
+import { voices, type Voice, type VoiceKey } from '../strands/voice.ts';
+
+type Flat = Exclude<keyof Voice, 'nav'>;
+type NavKey = `nav.${keyof Voice['nav']}`;
+
+interface Props {
+  k: Flat | NavKey;
+  /** Limit which variants render, e.g. ['01','02','03','04'] to omit civilian. */
+  only?: VoiceKey[];
+}
+
+const { k, only } = Astro.props;
+const keys = (only ?? (Object.keys(voices) as VoiceKey[])) as VoiceKey[];
+const read = (v: Voice): string =>
+  k.startsWith('nav.') ? v.nav[k.slice(4) as keyof Voice['nav']] : v[k as Flat];
+---
+
+{keys.map((key) => (
+  <span data-v={key}>{read(voices[key])}</span>
+))}

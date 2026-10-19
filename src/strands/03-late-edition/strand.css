@@ -1,0 +1,329 @@
+/*
+ * STRAND-03 — LATE EDITION, Phase 2 PROXY (DESIGN.md §5)
+ * Palette and type only, so the tear has a second reality to tear into. Grain, blinds, halftone,
+ * the hard-light cursor and the real layout arrive in Phase 3.
+ */
+@layer strand {
+  @media screen {
+    :root[data-mode='strand'][data-strand='03'] {
+      --chrome-h: 56px;
+      --pad: 16px;
+      --tear-paper: var(--bg);
+      --rail-w: 0px;
+
+      & body {
+        padding-block-end: 76px;
+      }
+      & .ink__key {
+        color: var(--fg);
+      }
+      & .ink__plate {
+        color: var(--fg);
+        opacity: 0.22;
+        translate: 0 calc(3px + (var(--ab) + var(--abv)) * var(--ab-amp));
+      }
+
+      & .chrome {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 50;
+        pointer-events: none;
+      }
+      & .chrome__bar {
+        pointer-events: auto;
+        max-inline-size: none;
+        margin: 0;
+        height: var(--chrome-h);
+        padding: 0 var(--pad);
+        background: var(--bg);
+        border-block-end: 4px double var(--fg);
+      }
+      & .chrome__mark {
+        font-family: var(--font-accent);
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+      & .chrome__bar {
+        flex-wrap: nowrap;
+      }
+      & .chrome__reg {
+        display: none;
+      }
+      & .chrome__name {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      & .chrome__short {
+        display: inline;
+      }
+      & .toggle {
+        border-radius: 0;
+        border-width: 1px;
+        font-family: var(--font-text);
+        min-height: 36px;
+        padding: 0 10px;
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        &[aria-pressed='true'] {
+          background: var(--fg);
+          color: var(--bg);
+        }
+      }
+
+      & .switcher {
+        pointer-events: auto;
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: 50;
+        padding: 8px var(--pad);
+        background: var(--bg);
+        border-block-start: 4px double var(--fg);
+      }
+      & .switcher fieldset {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      & .switcher__legend {
+        float: left;
+        font-family: var(--font-display);
+        font-size: 1.125rem;
+        text-transform: uppercase;
+      }
+      & .switcher__options {
+        display: flex;
+        gap: 8px;
+        flex: 1;
+      }
+      & .switcher__opt {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 6px 10px;
+        border: 1px solid var(--fg);
+        cursor: pointer;
+        & input {
+          position: absolute;
+          inset: 0;
+          opacity: 0;
+          margin: 0;
+        }
+        &:has(input:checked) {
+          background: var(--fg);
+          color: var(--bg);
+        }
+        &:has(input:focus-visible) {
+          outline: 3px solid var(--fg);
+          outline-offset: 3px;
+        }
+      }
+      & .switcher__swatch {
+        width: 22px;
+        height: 22px;
+        border: 1px solid currentColor;
+        background: linear-gradient(
+          135deg,
+          var(--sw-bg) 0 48%,
+          var(--sw-a) 48% 74%,
+          var(--sw-b) 74%
+        );
+      }
+      & .switcher__num {
+        font-family: var(--font-display);
+        font-size: 1.375rem;
+      }
+      & .switcher__name {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+      }
+
+      & :focus-visible {
+        outline: 3px solid var(--fg);
+        outline-offset: 3px;
+        box-shadow: none;
+      }
+
+      & .hero {
+        position: relative;
+        min-height: 100svh;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: var(--gutter);
+        align-content: start;
+        padding: calc(var(--chrome-h) + 24px) var(--pad) 72px;
+      }
+      & .hero__kicker {
+        grid-column: 1 / -1;
+        padding-block: 6px;
+        border-block: 1px solid var(--fg);
+        font-size: 0.8125rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg);
+      }
+      & .hero__name {
+        grid-column: 1 / -1;
+        margin-block: 14px 8px;
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(3.5rem, 21vw, 12rem);
+        line-height: 0.9;
+        text-transform: uppercase;
+      }
+      & .hero__panel {
+        grid-column: 1 / -1;
+        padding: 16px 18px 20px;
+        background: var(--panel);
+        color: var(--panel-fg);
+        & .ink__key {
+          color: var(--panel-fg);
+        }
+        & .ink__plate {
+          color: var(--panel-fg);
+        }
+      }
+      & .hero__statement {
+        font-family: var(--font-display);
+        font-size: clamp(2.5rem, 13vw, 6.5rem);
+        line-height: 0.92;
+        text-transform: uppercase;
+      }
+      & .hero__body {
+        grid-column: 1 / -1;
+        margin-block-start: 20px;
+        font-size: 1.0625rem;
+        line-height: 1.5;
+      }
+      & .hero__proof {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 16px;
+        margin-block-start: 24px;
+        padding-block-start: 12px;
+        border-block-start: 1px solid var(--fg);
+      }
+      & .proof {
+        display: grid;
+      }
+      & .proof__figure {
+        font-family: var(--font-display);
+        font-size: 2.75rem;
+        line-height: 1;
+      }
+      & .proof__label {
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        color: var(--fg-dim);
+      }
+      & .proof__note {
+        font-size: 0.875rem;
+        color: var(--fg-dim);
+      }
+
+      @media (min-width: 600px) {
+        --pad: 28px;
+        & body {
+          padding-block-end: 0;
+        }
+        & .chrome__name {
+          position: static;
+          width: auto;
+          height: auto;
+          overflow: visible;
+          clip-path: none;
+        }
+        & .chrome__short {
+          display: none;
+        }
+        & .switcher {
+          inset: auto 16px 16px auto;
+          border: 4px double var(--fg);
+        }
+        & .switcher__opt {
+          min-width: 150px;
+        }
+        & .hero {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        & .hero__panel {
+          grid-column: 2 / -1;
+        }
+        & .hero__body {
+          grid-column: 1 / 3;
+        }
+        & .hero__proof {
+          grid-column: 3 / -1;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        --pad: clamp(32px, 4vw, 80px);
+        --rail-w: 76px;
+        & .chrome__bar {
+          padding-inline-end: calc(var(--pad) + var(--rail-w));
+        }
+        & .switcher {
+          inset: 50% 0 auto auto;
+          translate: 0 -50%;
+          width: var(--rail-w);
+          padding: 0;
+          border: 0;
+          background: none;
+        }
+        & .switcher fieldset {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        & .switcher__legend {
+          float: none;
+          text-align: center;
+          font-size: 0.875rem;
+        }
+        & .switcher__options {
+          flex-direction: column;
+        }
+        & .switcher__opt {
+          min-width: 0;
+          flex-direction: column;
+          padding: 12px 6px;
+          background: var(--bg);
+        }
+        & .switcher__name {
+          writing-mode: vertical-rl;
+          rotate: 180deg;
+          font-size: 0.6875rem;
+        }
+        & .hero {
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          padding: calc(var(--chrome-h) + 4vh) calc(var(--pad) + var(--rail-w)) 12vh var(--pad);
+        }
+        & .hero__name {
+          font-size: clamp(5rem, 11vw, 12rem);
+        }
+        & .hero__panel {
+          grid-column: 3 / -1;
+          rotate: -2deg;
+        }
+        & .hero__body {
+          grid-column: 1 / 3;
+          grid-row: 3;
+          columns: 2;
+          column-gap: 16px;
+          column-rule: 1px solid var(--fg);
+          font-size: 1rem;
+        }
+        & .hero__proof {
+          grid-column: 3 / -1;
+        }
+      }
+    }
+  }
+}

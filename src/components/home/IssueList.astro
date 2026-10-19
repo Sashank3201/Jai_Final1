@@ -1,0 +1,149 @@
+---
+// Phase 2 stand-in for the home page's work section: a typographic index of the issues, so the
+// hero has something to scroll into (aberration, resolve, anchor restore). Phase 4 replaces it
+// with the full home sequence; Phase 5 builds the rack and the case-study pages it links to.
+import { profile } from '../../../content/profile.ts';
+import { phAttr } from '../../lib/ph.ts';
+import InkHeading from '../type/InkHeading.astro';
+---
+
+<section class="issues" data-anchor="issues" aria-labelledby="issues-title">
+  <InkHeading as="h2" id="issues-title" class="issues__title" text="Selected work" />
+  <ol class="issues__list" role="list">
+    {profile.work.map((c) => (
+      <li class="issue" data-anchor={`issue-${c.slug}`} {...phAttr(c)}>
+        <span class="issue__no" aria-hidden="true">
+          {String(c.issue).padStart(2, '0')}
+        </span>
+        <h3 class="issue__title">{c.title}</h3>
+        <p class="issue__tagline">{c.cover.tagline}</p>
+        <p class="issue__summary">{c.summary}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style is:global>
+  @layer base {
+    .issues__list {
+      padding: 0;
+      list-style: none;
+    }
+    .issue {
+      margin-block: 1.5rem;
+    }
+    .issue__title {
+      margin: 0;
+    }
+    .issue__tagline {
+      font-weight: 600;
+    }
+    .issue__summary {
+      color: var(--fg-dim);
+    }
+  }
+  @layer strand {
+    @media screen {
+      :root[data-mode='strand'] .issues {
+        position: relative;
+        padding: 12vh var(--pad) 18vh;
+        padding-inline-end: calc(var(--pad) + var(--rail-w));
+      }
+      :root[data-mode='strand'] .issue__no {
+        display: block;
+        font-family: var(--font-display);
+        font-size: var(--fs-6);
+        line-height: 0.8;
+      }
+      :root[data-mode='strand'][data-strand='01'] {
+        & .issues__title {
+          font-family: var(--font-display);
+          font-weight: 900;
+          font-stretch: 55%;
+          font-size: var(--fs-6);
+          line-height: 0.82;
+          text-transform: uppercase;
+          margin-block-end: 6vh;
+        }
+        & .issues__list {
+          display: grid;
+          gap: 48px var(--gutter);
+          grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+        }
+        & .issue {
+          grid-column: 1 / -1;
+          margin: 0;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          column-gap: 16px;
+          align-items: end;
+          padding-block-start: 16px;
+          border-block-start: 3px solid var(--fg);
+        }
+        & .issue__no {
+          grid-row: span 3;
+          align-self: start;
+          font-weight: 900;
+          font-stretch: 50%;
+          color: transparent;
+          -webkit-text-stroke: 2px var(--ink1);
+        }
+        & .issue:nth-child(even) .issue__no {
+          -webkit-text-stroke-color: var(--ink2);
+        }
+        & .issue__title {
+          font-family: var(--font-display);
+          font-weight: 900;
+          font-stretch: 60%;
+          font-size: var(--fs-4);
+          line-height: 0.9;
+          text-transform: uppercase;
+        }
+        & .issue__tagline {
+          font-family: var(--font-accent);
+          font-weight: 400;
+          font-size: var(--fs-1);
+          line-height: 1.15;
+          color: var(--ink1);
+        }
+        & .issue__summary {
+          max-inline-size: 52ch;
+          color: var(--fg-dim);
+        }
+        @media (min-width: 1024px) {
+          & .issue:nth-child(odd) {
+            grid-column: 1 / 9;
+          }
+          & .issue:nth-child(even) {
+            grid-column: 5 / 13;
+            margin-block-start: -24px;
+          }
+        }
+      }
+      :root[data-mode='strand'][data-strand='03'] {
+        & .issues__title {
+          font-family: var(--font-display);
+          font-size: var(--fs-5);
+          text-transform: uppercase;
+          border-block-end: 4px double var(--fg);
+        }
+        & .issue {
+          padding-block: 16px;
+          border-block-end: 1px solid var(--fg);
+        }
+        & .issue__no {
+          color: var(--fg);
+        }
+        & .issue__title {
+          font-family: var(--font-display);
+          font-weight: 400;
+          font-size: var(--fs-4);
+          text-transform: uppercase;
+        }
+        & .issue__tagline {
+          font-style: italic;
+        }
+      }
+    }
+  }
+</style>

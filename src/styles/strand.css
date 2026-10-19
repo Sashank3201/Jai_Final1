@@ -1,0 +1,67 @@
+/*
+ * Rules shared by every strand. Everything here is screen-only and only applies in strand mode,
+ * so print and civilian mode fall through to base.css untouched.
+ */
+@layer strand {
+  @media screen {
+    :root[data-mode='strand'] {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-text);
+      --ab-amp: 14px;
+
+      & [data-v='c'] {
+        display: none;
+      }
+
+      & main {
+        max-inline-size: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      & .switcher {
+        display: block;
+      }
+      & .toggle--motion {
+        display: inline-flex;
+      }
+
+      & .ink__plate {
+        display: block;
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        user-select: none;
+        &::before {
+          content: attr(data-text);
+        }
+      }
+
+      & :focus-visible {
+        outline: 3px solid var(--focus1);
+        outline-offset: 3px;
+      }
+
+      @media (max-width: 599px) {
+        --ab-amp: 6px;
+      }
+    }
+
+    :root[data-mode='strand'][data-strand='01'] [data-v='01'],
+    :root[data-mode='strand'][data-strand='02'] [data-v='02'],
+    :root[data-mode='strand'][data-strand='03'] [data-v='03'],
+    :root[data-mode='strand'][data-strand='04'] [data-v='04'] {
+      display: inline;
+    }
+
+    /* Hide the native cursor only once a strand cursor has mounted (pointer: fine). */
+    :root[data-mode='strand'][data-cursor],
+    :root[data-mode='strand'][data-cursor] * {
+      cursor: none;
+    }
+    :root[data-mode='strand'][data-cursor] :is(input[type='text'], input[type='email'], textarea) {
+      cursor: text;
+    }
+  }
+}

@@ -1,0 +1,103 @@
+---
+// Home hero. One DOM for every strand and for civilian mode; each strand art-directs it in its
+// own stylesheet. The real text never moves (LCP, selection, screen readers); motion lives on
+// aria-hidden plates, SFX and texture layers.
+import { profile } from '../../../content/profile.ts';
+import { phAttr } from '../../lib/ph.ts';
+import InkHeading from '../type/InkHeading.astro';
+
+const { person, pitch } = profile;
+const [first, ...rest] = pitch.proofPoints;
+---
+
+<section class="hero" data-anchor="hero" data-resolve aria-labelledby="hero-name">
+  <p class="hero__kicker" {...phAttr(pitch.kicker)}>
+    {pitch.kicker}
+  </p>
+
+  <InkHeading as="h1" id="hero-name" class="hero__name" text={person.name} />
+
+  <div class="hero__panel">
+    <span class="hero__spray" data-deco aria-hidden="true"></span>
+    <InkHeading as="p" class="hero__statement" text={pitch.statement} />
+  </div>
+
+  <p class="hero__body" {...phAttr(pitch.body)}>
+    {pitch.body}
+  </p>
+
+  <ul class="hero__proof" role="list" aria-label="Proof">
+    {first && (
+      <li class="proof">
+        <span class="proof__figure">{first.figure}</span>
+        <span class="proof__label">{first.label}</span>
+        <span class="proof__note" {...phAttr(pitch.marginNote)}>
+          <span class="proof__note-text">{pitch.marginNote}</span>
+          <svg class="proof__arrow" data-deco aria-hidden="true" viewBox="0 0 120 70">
+            <path d="M112 8 C 86 4, 52 18, 30 44 M30 44 l 4 -16 M30 44 l 16 -2" />
+          </svg>
+        </span>
+      </li>
+    )}
+    {rest.map((p) => (
+      <li class="proof">
+        <span class="proof__figure">{p.figure}</span>
+        <span class="proof__label">{p.label}</span>
+      </li>
+    ))}
+  </ul>
+
+  <span class="hero__sfx" data-deco aria-hidden="true">
+    SKRAANCH
+  </span>
+  <div class="hero__dots" data-deco aria-hidden="true"></div>
+</section>
+
+<style is:global>
+  @layer base {
+    .hero {
+      position: relative;
+      padding-block: 1rem 2rem;
+    }
+    .hero__kicker {
+      font-size: 0.875rem;
+      color: var(--fg-dim);
+    }
+    .hero__name {
+      margin-block: 0.25rem 1rem;
+    }
+    .hero__statement {
+      font-size: 1.375rem;
+      font-weight: 700;
+    }
+    .hero__body {
+      margin-block: 1rem;
+    }
+    .hero__proof {
+      display: grid;
+      gap: 0.5rem;
+      padding: 0;
+      list-style: none;
+    }
+    .proof__figure {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .proof__label::before {
+      content: ' ';
+    }
+    .proof__note {
+      color: var(--fg-dim);
+      font-style: italic;
+    }
+    .proof__note-text::before {
+      content: ' (';
+    }
+    .proof__note-text::after {
+      content: ')';
+    }
+    .ink {
+      position: relative;
+    }
+  }
+</style>

@@ -1,0 +1,98 @@
+/*
+ * View-transition styling for the strand tear (DESIGN.md §2.5) and the reduced-motion fade.
+ * The tear's clip path and edge travel are animated from JS (engine/transition.ts) because each
+ * switch generates a new jagged edge; this file sets up the layers they animate.
+ */
+@layer state {
+  /* Keep the page usable mid-transition so a second switch can interrupt the first. */
+  ::view-transition {
+    pointer-events: none;
+  }
+
+  /* Tear: no crossfade. The old snapshot sits on top and is clipped away; the new page is live. */
+  :root[data-vt='strand']::view-transition-old(root),
+  :root[data-vt='strand']::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  :root[data-vt='strand']::view-transition-old(root) {
+    z-index: 1;
+  }
+
+  ::view-transition-group(tear-edge),
+  ::view-transition-new(tear-edge),
+  ::view-transition-old(tear-edge) {
+    animation: none;
+  }
+  ::view-transition-group(tear-edge) {
+    z-index: 2;
+  }
+
+  .tear-edge {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    pointer-events: none;
+    view-transition-name: tear-edge;
+    contain: strict;
+    & svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    & .paper {
+      fill: var(--tear-paper, var(--panel));
+    }
+    & .fuzz {
+      fill: none;
+      stroke: var(--tear-paper, var(--panel));
+      stroke-width: 5px;
+      stroke-dasharray: 1 2.5;
+      stroke-linecap: round;
+    }
+    & .ink-old,
+    & .ink-new {
+      fill: none;
+      stroke-linejoin: miter;
+      stroke-miterlimit: 3;
+    }
+    & .ink-old {
+      stroke: var(--ink2, #00e5ff);
+      stroke-width: 2.5px;
+    }
+    & .ink-new {
+      stroke: var(--ink1, #ff2e88);
+      stroke-width: 3px;
+    }
+  }
+
+  /* Reduced motion and mode changes: opacity only. */
+  :root[data-vt='fade']::view-transition-old(root) {
+    animation: vt-fade-out var(--dur-fade, 240ms) var(--ease-fade, linear) both;
+  }
+  :root[data-vt='fade']::view-transition-new(root) {
+    animation: vt-fade-in var(--dur-fade, 240ms) var(--ease-fade, linear) both;
+  }
+  @keyframes vt-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes vt-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Reduced motion (OS setting or "hold still"): no keyframe motion anywhere, and the only
+     transitions left are opacity. Scripted effects never mount in this mode (engine/main.ts). */
+  :root[data-motion='reduced'] :is(*, *::before, *::after) {
+    animation-name: none;
+    transition-property: opacity;
+  }
+
+  /* While a tear runs, scroll jumps must be instant so the anchor restore is exact. */
+  :root[data-vt] {
+    scroll-behavior: auto;
+  }
+}
