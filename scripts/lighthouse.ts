@@ -9,6 +9,14 @@ const base = process.argv[2] ?? 'http://localhost:4321';
 const targets = ['/?strand=01', '/?strand=03', '/?mode=civilian'];
 const chromePath = process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 
+const alive = await fetch(base)
+  .then((r) => r.ok)
+  .catch(() => false);
+if (!alive) {
+  console.error(`Nothing is serving ${base}. Start it with \`pnpm preview\` first.`);
+  process.exit(1);
+}
+
 const chrome = await launch({ chromePath, chromeFlags: ['--headless=new', '--no-sandbox'] });
 let failed = false;
 const rows: string[] = [];

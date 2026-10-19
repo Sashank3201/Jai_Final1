@@ -2,15 +2,19 @@ import { defineConfig, fontProviders } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import vercel from '@astrojs/vercel';
 import { profile } from './content/profile.ts';
-import { placeholderCount } from './src/lib/ph.ts';
+import { isPlaceholder, launchBlocked, placeholderCount, siteOrigin } from './src/lib/ph.ts';
 
+const siteIsPlaceholder = isPlaceholder(profile.site.url);
 if (
-  process.env.VERCEL_ENV === 'production' &&
-  process.env.ALLOW_PLACEHOLDERS !== '1' &&
-  placeholderCount() > 0
+  launchBlocked({
+    env: process.env.VERCEL_ENV,
+    allow: process.env.ALLOW_PLACEHOLDERS === '1',
+    siteIsPlaceholder,
+    count: placeholderCount(),
+  })
 ) {
   throw new Error(
-    `content/profile.ts still has ${placeholderCount()} placeholder values. Run \`pnpm content:audit\`, or set ALLOW_PLACEHOLDERS=1 to ship them anyway.`,
+    `site.url is set to ${profile.site.url}, but content/profile.ts still has ${placeholderCount()} placeholder values. Run \`pnpm content:audit\`, or set ALLOW_PLACEHOLDERS=1 to ship them anyway.`,
   );
 }
 
@@ -30,7 +34,7 @@ const local = (
 const file = (name: string): [string] => [`./src/assets/fonts/${name}.woff2`];
 
 export default defineConfig({
-  site: profile.site.url,
+  site: siteOrigin(profile.site.url, siteIsPlaceholder, process.env),
   output: 'static',
   adapter: vercel(),
   integrations: [mdx()],

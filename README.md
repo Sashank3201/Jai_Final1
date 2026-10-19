@@ -12,8 +12,21 @@ placeholders; replace `ph("…")` with `"…"` as you fill them in.
 pnpm content:audit   # what is still placeholder
 ```
 
-A Vercel production build refuses to ship placeholders (set `ALLOW_PLACEHOLDERS=1` to override).
-Media goes in `content/media/`, blog posts in `content/writing/`.
+While any placeholder remains, every page is marked `noindex`. Once you set `site.url` to your real
+domain, a Vercel production build refuses to ship with placeholders still in place (set
+`ALLOW_PLACEHOLDERS=1` to override). Media goes in `content/media/`, blog posts in
+`content/writing/`.
+
+## Deploy (Vercel)
+
+1. On vercel.com/new choose **Import Git Repository** and pick this repo (grant the Vercel GitHub
+   app access if asked).
+2. The framework preset auto-detects **Astro**. Keep the default build, output and install
+   settings; no environment variables are needed.
+3. Deploy. The production branch is the repo's default branch, so every push redeploys.
+
+Until `site.url` in `content/profile.ts` is your real domain, canonical URLs use the Vercel
+deployment's own address.
 
 ## Commands
 

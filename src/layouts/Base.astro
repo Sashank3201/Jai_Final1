@@ -3,6 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import { Font } from 'astro:assets';
 import { profile } from '../../content/profile.ts';
 import { boot, type BootConfig } from '../engine/boot.ts';
+import { placeholderCount } from '../lib/ph.ts';
 import { AVAILABLE, DEFAULT_STRAND } from '../strands/ids.ts';
 import { strandTokens } from '../strands/tokens.ts';
 import Chrome from '../components/chrome/Chrome.astro';
@@ -22,7 +23,9 @@ interface Props {
 
 const { title, description = profile.site.description } = Astro.props;
 const pageTitle = title ? `${title} · ${profile.person.name}` : profile.site.title;
-const canonical = new URL(Astro.url.pathname, profile.site.url).href;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? profile.site.url).href;
+// The placeholder persona must never be indexed; this disappears once profile.ts is real.
+const noindex = placeholderCount() > 0;
 
 const bootConfig: BootConfig = {
   def: DEFAULT_STRAND,
@@ -44,6 +47,7 @@ const bootScript = `(${boot.toString()})(${JSON.stringify(bootConfig)})`;
     <script is:inline set:html={bootScript} />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <Font cssVariable="--font-anybody" preload />
